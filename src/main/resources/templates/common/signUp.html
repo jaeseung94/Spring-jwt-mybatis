@@ -20,36 +20,36 @@
 					</div> -->
 					<div class="signup_hr"></div>
 					<div class="signup_text">
-						<input type="text" placeholder="사용자 아이디" class="form-control"
+						<input type="text" placeholder="사용자 아이디" class="form-control input-valid"
 							name="id" id="id" onfocusout="focusOut(this);" />
 						<div class="invalid-feedback">이미 사용중 입니다.</div>
 						<div class="valid-feedback">사용가능합니다.</div>
 					</div>
 					<div class="signup_text">
-						<input type="password" placeholder="비밀번호" class="form-control"
+						<input type="password" placeholder="비밀번호" class="form-control input-valid"
 							name="password" id="password" onfocusout="focusOut(this);"  autocomplete="new-password"  />
 						<div class="invalid-feedback">필수 항목입니다.</div>
 					</div>
 					<div class="signup_text">
-						<input type="password" placeholder="비밀번호 확인" class="form-control"
+						<input type="password" placeholder="비밀번호 확인" class="form-control input-valid"
 							name="confirm_password" id="confirm_password"
 							onfocusout="passwordCheck(this);" />
 						<div class="invalid-feedback">필수 항목입니다.</div>
 					</div>
 					<div class="signup_text">
-						<input type="text" placeholder="성명" class="form-control"
+						<input type="text" placeholder="성명" class="form-control input-valid"
 							name="name" id="name" onfocusout="focusOut(this);" />
 						<div class="invalid-feedback">필수 항목입니다.</div>
 					</div>
 					<div class="signup_text">
-						<input type="email" placeholder="이메일" class="form-control"
+						<input type="email" placeholder="이메일" class="form-control input-valid"
 							name="email" id="email" onfocusout="focusOut(this);" />
 						<div class="invalid-feedback">이미 사용중 입니다.</div>
 						<div class="valid-feedback">사용가능합니다.</div>
 					</div>
 					<div class="signup_text">
-						<input type="text" placeholder="핸드폰번호" class="form-control"
-							name="cellno" id="cellno" onfocusout="focusOut(this);" />
+						<input type="text" placeholder="핸드폰번호" class="form-control input-valid"
+							name="cellno" id="cellno" onfocusout="focusOut(this);" onkeyup="formatCellno(this);"/>
 						<div class="invalid-feedback">필수 항목입니다.</div>
 					</div>
 				
@@ -88,115 +88,130 @@
 	</div>
 </body>
 <script>
-    function submit() {
-        const id = document.getElementById("id");
-        const password = document.getElementById("password");
-        const confirm_password = document.getElementById("confirm_password");
-        const name = document.getElementById("name");
-        const email = document.getElementById("email");
-        const cellno = document.getElementById("cellno");
 
-        let invalid_count = 0;
-
-        invalid_count = invalid_count + validationCheck(id);
-        invalid_count = invalid_count + validationCheck(password);
-        invalid_count = invalid_count + validationCheck(confirm_password);
-        invalid_count = invalid_count + validationCheck(name);
-        invalid_count = invalid_count + validationCheck(email);
-        invalid_count = invalid_count + validationCheck(cellno);
-
-        if(invalid_count == 0){
-            /* var userData = new FormData();
-            userData.append("id", id.value);
-            userData.append("password", password.value);
-            userData.append("name", name.value);
-            userData.append("email", email.value); */
-            var formSerializeArray  = $("#form").serializeArray();
-            
-            var object = {};
-            for (var i = 0; i < formSerializeArray.length; i++){
-                object[formSerializeArray[i]['name']] = formSerializeArray[i]['value'];
+	// 회원가입
+    function submit() { 
+        
+        var result = true;
+        
+        $("input.input-valid").each(function(){
+            if(!validationCheck(this)){
+            	result = false;
+            	return false;
             }
-             
-            var jsonData = JSON.stringify(object);  
-            
-            $.ajax({
-            	url: "/comm/signUp",
-    			//url : "/api/auth/login",
-    			//url : "/login",
-    			type : "POST",
-    			dataType : "json",
-    			contentType : 'application/json;charset=utf-8',
-    			data: jsonData,
-    			//data : $("#form").serialize(),
-    			success : function(data, status) {
-    				console.log(status);
-    				 if(data) {
-                         location.href = "/login";
-                     } else {
-                         alert("error");
-                     }
-    			},
-    			error : function(response) {
-    				alert("관리자에게 문의 바랍니다.");
-    			}
-
-    		})            
+     	});
+        
+        if(!result){
+        	return false;
+        }  
+    
+        var formSerializeArray  = $("#form").serializeArray();
+        
+        var object = {};
+        for (var i = 0; i < formSerializeArray.length; i++){
+            object[formSerializeArray[i]['name']] = formSerializeArray[i]['value'];
         }
-    }
+         
+        var jsonData = JSON.stringify(object);  
+        
+        $.ajax({
+        	url: "/comm/signUp",
+			type : "POST",
+			dataType : "json",
+			contentType : 'application/json;charset=utf-8',
+			data: jsonData,
+			success : function(data, status) {
+				console.log(status);
+				if(data) {
+                	location.href = "/login";
+                } else {
+                    alert("error");
+                }
+			},
+			error : function(response) {
+				alert("관리자에게 문의 바랍니다.");
+			}
 
+   		})           
+    }
+	
+    // 포커스 아웃시
     function focusOut(element) {
         const id = element.id;
-        if(id == "email" || id == "id"){
-            ajaxCheck(element);
-        }else{
-            validationCheck(element);
-        }
+        
+        if(validationCheck(element)){	       
+        	if(id == "email" || id == "id"){
+	        	ajaxCheck(element);        		
+        	}
+        }         
     }
-
+	
+    // 등록된 정보인지 확인
     function ajaxCheck(element) {
         const value = element.value;
         const url = "/comm/check"+element.id.replace(/^[a-z]/, char => char.toUpperCase());
         const submit_data = element.id +"="+value;
-        if(value.length > 0){
             $.ajax({
-//                type: "get",
                 url: url,
                 data: submit_data,
                 dataType:"json",
                 success: function (data) {
-                    if(data == 1) {
+                    if(data == 1) {          	
                         element.classList.remove("is-valid");
                         element.classList.add("is-invalid");
-                    } else if(data == 0) {
+                        element.nextSibling.nextSibling.innerHTML = "이미 사용중입니다";
+                    } 
+                    else if(data == 0) {
                         element.classList.remove("is-invalid");
                         element.classList.add("is-valid");
-                    }
+                    } 
                 },
                 error: function (xhr,err){
-                    alert("관리자에게 문의하세요.");
+                    alert("체크 오류. 관리자에게 문의하세요.");     
                 }
             });
-        }else{
-            element.classList.add("is-invalid");
-            element.classList.remove("is-valid");
-            invalidFeedBack(element, 1);
-        }
     }
 
+    // 입력값 유효성 검사
     function validationCheck(element) {
         const value = element.value;
         if(value == "" || value == null){
             element.classList.add("is-invalid");
             element.classList.remove("is-valid");
-            invalidFeedBack(element, 1);
-            return 1;
+            element.nextSibling.nextSibling.innerHTML = "필수 정보입니다";
+            return false;
         }else {
-            element.classList.remove("is-invalid");
-            return 0;
+        	if(element.id == "cellno"){
+	        	if(!checkCellnoFormat(value)){
+	        		element.classList.add("is-invalid");
+	                element.classList.remove("is-valid");
+	        		element.nextSibling.nextSibling.innerHTML = "유효하지 않는 전화번호입니다.";
+	        		return false;
+	        	} else {
+	       			element.classList.remove("is-invalid");
+	                element.classList.add("is-valid");
+	        	}
+        	} else if(element.id == "email"){
+        		if(!checkEmailFormat(value)){
+	        		element.classList.add("is-invalid");
+	                element.classList.remove("is-valid");
+	        		element.nextSibling.nextSibling.innerHTML = "유효하지 않는 이메일입니다.";
+	        		return false;
+	        	} else {
+	       			element.classList.remove("is-invalid");
+	                element.classList.add("is-valid");
+	        	}        		
+        	} 
+        	
+        	else {
+        		element.classList.remove("is-invalid");
+        	}        	
+        	
+            return true;
         }
     }
 
+    // 비밀번호 체크
     function passwordCheck(element) {
         const password = document.getElementById("password").value;
         if(password != element.value){
@@ -211,25 +226,72 @@
             element.classList.remove("is-invalid");
             element.classList.add("is-valid");
         }
-    }
-
-    function invalidFeedBack(element, division) {
-        if(division == 1){
-            element.nextSibling.nextSibling.innerHTML = "필수 정보 입니다.";
-        }else if(division == 2){
-            element.nextSibling.nextSibling.innerHTML = "이미 사용중 입니다.";
-        }
-    }
+    }   
     
     //휴대번호 유효성 체크
-    function inputCellNo(args) {	
-    	const msg = '유효하지 않는 전화번호입니다.';
-        if (/^[0-9]{3}-[0-9]{4}-[0-9]{4}$/.test(args.value)) {
-        	console.log(args.value);
+    function checkCellnoFormat(value) {	
+    	var patternPhone = /01[016789]-[^0][0-9]{2,3}-[0-9]{3,4}/;
+    	///^[0-9]{3}-[0-9]{4}-[0-9]{4}$/
+        if (patternPhone.test(value)) {
             return true;
         }
         // alert(msg);
         return false;
 	}
+    
+    // 핸드폰번호 하이픈 자동 생성
+    function formatCellno(element){
+    	/* element.value = element.value
+    	  .replace(/[^0-9]/g, '') // 숫자를 제외한 모든 문자 제거
+    	  .replace(/^(\d{2,3})(\d{3,4})(\d{4})$/, `$1-$2-$3`);  */   
+		value = element.value.replace(/[^0-9]/g, "");
+		
+		let result = [];
+		let restNumber = "";
+		
+		/* // 지역번호와 나머지 번호로 나누기
+		if (value.startsWith("02")) {
+		  // 서울 02 지역번호
+		  result.push(value.substr(0, 2));
+		  restNumber = value.substring(2);
+		} else if (value.startsWith("1")) {
+		  // 지역 번호가 없는 경우
+		  // 1xxx-yyyy
+		  restNumber = value;
+		} else {
+		  // 나머지 3자리 지역번호
+		  // 0xx-yyyy-zzzz
+		  result.push(value.substr(0, 3));
+		  restNumber = value.substring(3);
+		} */
+		
+		result.push(value.substr(0, 3));
+		restNumber = value.substring(3);
+		
+		if (restNumber.length === 7) {
+		  // 7자리만 남았을 때는 xxx-yyyy
+		  result.push(restNumber.substring(0, 3));
+		  result.push(restNumber.substring(3));
+		} else {
+		  result.push(restNumber.substring(0, 4));
+		  result.push(restNumber.substring(4));
+		}
+
+		element.value = result.filter((val) => val).join("-");
+    }
+    
+    // 이메일 형식 체크
+    function checkEmailFormat(value){
+
+    	var regExpEmail = /^[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*\.[a-zA-Z]{2,3}$/i;
+       
+        if(regExpEmail.test(value))
+        {
+           
+            return true;
+        }
+        return false;
+
+    }
 </script>
 </html>

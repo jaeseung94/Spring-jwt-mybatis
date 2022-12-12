@@ -42,7 +42,9 @@ public class CommonService {
 		logger.info("vo : " + vo);
 		logger.info("========================================");
 		
+		// 회원 등록
 		vo.setPassword(passwordEncoder.encode(vo.getPassword()));
+		//vo.setCellno(vo.getCellno().replaceAll("-", ""));
 		mapper.insertUser(vo);
 		authVo.setUserNo(vo.getTno());
 		mapper.insertUserAuth(authVo);		

@@ -32,7 +32,7 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
 		logger.info("유효한 자격증명을 제공하지 않고 접근하려 할때 401 ");
 		logger.info("=================================================");
 		
-		if(request.getServletPath().matches("/api/authenticate")) {
+		if(request.getServletPath().matches("/comm/login")) {
 			logger.info("=================================================");
 			logger.info("로그인 경로 ");
 			logger.info("=================================================");
