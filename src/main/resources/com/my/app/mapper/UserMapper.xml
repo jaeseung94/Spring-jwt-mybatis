@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.my.app.mapper.UserMapper">
+
+	<resultMap type="com.my.app.entity.UserVO" id="userMap">
+		<id property="tno" column="tno"></id>
+		<result property="tno" column="tno"/>
+		<result property="id" column="id"/>
+		<result property="email" column="email"/>
+		<result property="cellno" column="cellno"/>
+		<result property="password" column="password"/>
+		<result property="name" column="name"/>
+		<result property="regDate" column="regDate"/>
+		<result property="updateDate" column="updateDate"/>		
+		<collection property="authList" resultMap="authMap"></collection>
+	</resultMap>
+	
+	<resultMap type="com.my.app.entity.AuthVO" id="authMap">
+		<result property="tno" column="tno"/>	
+		<result property="userNo" column="user_no"/>	
+		<result property="auth" column="auth"/>	
+	</resultMap>
+
+	<select id="getUser" resultMap="userMap">
+		select a.*, b.auth 
+		from tbl_user a
+		left join tbl_user_auth b on b.user_no = a.tno
+		where a.id = #{userid} 
+	</select>
+	
+	<!-- 사용자 조회 -->
+	<select id="checkId" resultType="int">
+		select count(*)
+		from tbl_user 
+		where id = #{id}
+	</select>
+	
+	<select id="checkEmail" resultType="int">
+		select count(*)
+		from tbl_user 
+		where email = #{email}
+	</select>
+	
+	<insert id="insertUser" >
+		
+		insert into tbl_user(tno, id, email, password, cellno, name)
+		values (seq_user.nextval, #{id},  #{email}, #{password}, #{cellno}, #{name})
+				
+		<selectKey keyProperty="tno" resultType="int" order="AFTER" >
+			select seq_user.CURRVAL FROM DUAL
+		</selectKey>
+
+        <!-- begin
+            insert into tbl_user(tno, id, email, password, cellno, name)
+			values (#{tno}, #{id},  #{email}, #{password}, #{cellno}, #{name});
+			
+			insert into tbl_user_auth(tno, user_no, auth)
+			values (seq_user_auth.nextval, #{tno}, 'member' );
+        end; -->
+	</insert>
+	
+	<insert id="insertUserAuth">
+		insert into tbl_user_auth(tno, user_no, auth)
+		values (seq_user_auth.nextval, #{userNo}, #{auth} )
+	</insert>
+	
+</mapper>

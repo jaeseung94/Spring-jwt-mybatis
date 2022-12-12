@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html" charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/bootstrap.min.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/login.css}">
+    <title>로그인</title>
+    <style type="text/css">
+    	html,
+		body {
+		    height: 100%;
+		}
+		
+		.container {
+		    height: 100%;
+		    width:100%;
+		    display: flex;
+		    justify-content: center;
+		    align-items: center;
+		}
+    </style>
+</head>
+
+<body>
+<div class="container">
+	<div class="col-md-6 col-xs-6">
+	    <h2 class="login_title">로그인</h2>
+	    <div>
+	    	<form id="form">
+		        <div class="login_text">
+		            <input type="text" placeholder="아이디" class="form-control" name="id" id="id" required="required"/>
+		        </div>
+		        <div class="login_text">
+		            <input type="password" placeholder="비밀번호" class="form-control" name="password" id="password" required="required"/>
+		        </div>
+		        <!-- <div class="login_text">
+		            <div id="invalid-message" style="color: #ff003e"></div>
+		        </div> -->
+		        <div class="login_text">
+	                
+                    <p id="invalid-message" class="alert alert-danger" style="display: none;"></p>
+	                
+	            </div>
+		        <div class="login_btn">
+		            <button class="btn btn-success" onclick="login();" type="button">로그인</button>
+		        </div>
+		        <div class="login_hr"></div>
+		        <div>
+		            <div class="login_text_naver">
+		                <a href="#">네이버</a>로 로그인
+		            </div>
+		            <div class="login_text_a">
+		                <a href="#">비밀번호를 잊으셧나요?</a>
+		            </div>
+		        </div>
+		        <div class="login_hr"></div>
+		        <div class="login_text_p">
+		            <P>
+		                계정이 없으신가요?
+		                <a href="/comm/signUp">가입하기</a>
+		            </P>
+		        </div>
+	        </form>
+	    </div>
+    </div>
+</div>
+
+</body>
+<script type="text/javascript">
+    window.onload = function () {
+
+    }
+
+	function login() {
+
+		var formData = {
+			"id" : $("#id").val(),
+			"password" : $("#password").val()
+		}
+
+		$.ajax({
+			url : "/comm/login",
+			//url : "/api/auth/login",
+			//url : "/login",
+			type : "POST",
+			dataType : "json",
+			contentType : 'application/json',
+			data : JSON.stringify(formData),
+			//data : $("#form").serialize(),
+			success : function(data, status) {
+				if (data && data.token) {
+					// 정상 처리 된 경우
+					window.location = "/comm/index";	//이전페이지로 돌아가기
+					console.log(data);
+					//alert("로그인되었습니다!");
+				} else {
+					//alert(response.message);
+					$("#invalid-message").css("display", "");
+					$("#invalid-message").html(data.message);
+					
+					console.log(data);
+				}
+			},
+			error : function(response) {
+				alert("관리자에게 문의 바랍니다.");
+			}
+
+		})
+
+	}
+</script>
+</html>

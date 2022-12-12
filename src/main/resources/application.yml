@@ -1,0 +1,54 @@
+spring:
+
+#  h2:
+#    console:
+#      enabled: true
+
+  datasource:
+    url: jdbc:oracle:thin:@localhost:1521/xe
+    driver-class-name: oracle.jdbc.driver.OracleDriver
+    username: c##book_ex
+    password: book_ex
+    hikari:
+      connection-timeout: 3000
+      validation-timeout: 3000
+      minimum-idle: 5
+      max-lifetime: 240000
+      maximum-pool-size: 20
+
+#  devtools:
+#    livereload:
+#      enabled: true
+#  freemarker:
+#    cache: false
+#  thymeleaf:
+#    cache: false
+#      
+#  jpa:
+#    database-platform: org.hibernate.dialect.H2Dialect
+#    hibernate:
+#      ddl-auto: create-drop
+#    properties:
+#      hibernate:
+#        format_sql: true
+#        show_sql: true
+#    defer-datasource-initialization: true
+
+jwt:
+  header: Authorization
+  #HS512 알고리즘을 사용할 것이기 때문에 512bit, 즉 64byte 이상의 secret key를 사용해야 한다.
+  
+  secret: security-jwtsecurity-jwtsecurity-jwtsecurity-jwtsecurity-jwtsecurity-jwtsecurity-jwtsecurity-jwtsecurity-jwt
+  token-validity-in-seconds: 86400
+
+logging:
+  level:
+    me.silvernine: DEBUG
+    
+mybatis:   
+  # 패키지 명을 생략할 수 있도록 alias 설정
+  type-aliases-package: com.my.app.entity
+  
+server:
+  port: 8081
+  

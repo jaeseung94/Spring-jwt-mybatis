@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta http-equiv="Content-Type" content="text/html" charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link rel="stylesheet" type="text/css"
+	th:href="@{/css/bootstrap.min.css}">
+<link rel="stylesheet" type="text/css" th:href="@{/css/signup.css}">
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<title>회원가입</title>
+</head>
+<body>
+	<div class="container">
+		<div class="col-md-6 col-xs-6">
+			<h2 class="signup_title">회원가입</h2>
+			<div>
+				<form id="form">
+					<!-- <div class="signup_btn">
+						<button class="btn btn-success" type="button">네이버로 로그인</button>
+					</div> -->
+					<div class="signup_hr"></div>
+					<div class="signup_text">
+						<input type="text" placeholder="사용자 아이디" class="form-control"
+							name="id" id="id" onfocusout="focusOut(this);" />
+						<div class="invalid-feedback">이미 사용중 입니다.</div>
+						<div class="valid-feedback">사용가능합니다.</div>
+					</div>
+					<div class="signup_text">
+						<input type="password" placeholder="비밀번호" class="form-control"
+							name="password" id="password" onfocusout="focusOut(this);"  autocomplete="new-password"  />
+						<div class="invalid-feedback">필수 항목입니다.</div>
+					</div>
+					<div class="signup_text">
+						<input type="password" placeholder="비밀번호 확인" class="form-control"
+							name="confirm_password" id="confirm_password"
+							onfocusout="passwordCheck(this);" />
+						<div class="invalid-feedback">필수 항목입니다.</div>
+					</div>
+					<div class="signup_text">
+						<input type="text" placeholder="성명" class="form-control"
+							name="name" id="name" onfocusout="focusOut(this);" />
+						<div class="invalid-feedback">필수 항목입니다.</div>
+					</div>
+					<div class="signup_text">
+						<input type="email" placeholder="이메일" class="form-control"
+							name="email" id="email" onfocusout="focusOut(this);" />
+						<div class="invalid-feedback">이미 사용중 입니다.</div>
+						<div class="valid-feedback">사용가능합니다.</div>
+					</div>
+					<div class="signup_text">
+						<input type="text" placeholder="핸드폰번호" class="form-control"
+							name="cellno" id="cellno" onfocusout="focusOut(this);" />
+						<div class="invalid-feedback">필수 항목입니다.</div>
+					</div>
+				
+				<!-- <div class="signup_text">
+							<div class="row">
+								<div class="col-md-8 col-xs-8"> 
+									<div class="form-group">
+									<input type="number" placeholder="핸드폰번호" class="form-control"
+									name="cellno" id="cellno" onfocusout="focusOut(this);" /> 
+									</div>
+								</div>
+								<div class="col-md-4 col-xs-4">
+									<div class="form-group">
+									<button disabled id="sendMessage" onclick="getToken()" class="btn btn-warning" style="width: 100%">인증번호 전송</button>
+									</div>
+								</div>
+								<div class="invalid-feedback">필수 항목입니다.</div>
+							</div>
+						</div> -->
+				</form>
+				<div class="signup_btn">
+					<button class="btn btn-success" type="button" onclick="submit();">가입</button>
+				</div>
+				<div class="signup_text_login">
+					<P>
+						계정이 있으신가요? <a th:href="@{~/login}">로그인</a>
+					</P>
+				</div>
+				<div class="signup_text_signup">
+					<P>
+						회사 및 단체 계정이 필요하세요? <a th:href="@{~/signupGroup}">법인 회원 가입</a>
+					</P>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+<script>
+    function submit() {
+        const id = document.getElementById("id");
+        const password = document.getElementById("password");
+        const confirm_password = document.getElementById("confirm_password");
+        const name = document.getElementById("name");
+        const email = document.getElementById("email");
+        const cellno = document.getElementById("cellno");
+
+        let invalid_count = 0;
+
+        invalid_count = invalid_count + validationCheck(id);
+        invalid_count = invalid_count + validationCheck(password);
+        invalid_count = invalid_count + validationCheck(confirm_password);
+        invalid_count = invalid_count + validationCheck(name);
+        invalid_count = invalid_count + validationCheck(email);
+        invalid_count = invalid_count + validationCheck(cellno);
+
+        if(invalid_count == 0){
+            /* var userData = new FormData();
+            userData.append("id", id.value);
+            userData.append("password", password.value);
+            userData.append("name", name.value);
+            userData.append("email", email.value); */
+            var formSerializeArray  = $("#form").serializeArray();
+            
+            var object = {};
+            for (var i = 0; i < formSerializeArray.length; i++){
+                object[formSerializeArray[i]['name']] = formSerializeArray[i]['value'];
+            }
+             
+            var jsonData = JSON.stringify(object);  
+            
+            $.ajax({
+            	url: "/comm/signUp",
+    			//url : "/api/auth/login",
+    			//url : "/login",
+    			type : "POST",
+    			dataType : "json",
+    			contentType : 'application/json;charset=utf-8',
+    			data: jsonData,
+    			//data : $("#form").serialize(),
+    			success : function(data, status) {
+    				console.log(status);
+    				 if(data) {
+                         location.href = "/login";
+                     } else {
+                         alert("error");
+                     }
+    			},
+    			error : function(response) {
+    				alert("관리자에게 문의 바랍니다.");
+    			}
+
+    		})            
+        }
+    }
+
+    function focusOut(element) {
+        const id = element.id;
+        if(id == "email" || id == "id"){
+            ajaxCheck(element);
+        }else{
+            validationCheck(element);
+        }
+    }
+
+    function ajaxCheck(element) {
+        const value = element.value;
+        const url = "/comm/check"+element.id.replace(/^[a-z]/, char => char.toUpperCase());
+        const submit_data = element.id +"="+value;
+        if(value.length > 0){
+            $.ajax({
+//                type: "get",
+                url: url,
+                data: submit_data,
+                dataType:"json",
+                success: function (data) {
+                    if(data == 1) {
+                        element.classList.remove("is-valid");
+                        element.classList.add("is-invalid");
+                    } else if(data == 0) {
+                        element.classList.remove("is-invalid");
+                        element.classList.add("is-valid");
+                    }
+                },
+                error: function (xhr,err){
+                    alert("관리자에게 문의하세요.");
+                }
+            });
+        }else{
+            element.classList.add("is-invalid");
+            element.classList.remove("is-valid");
+            invalidFeedBack(element, 1);
+        }
+    }
+
+    function validationCheck(element) {
+        const value = element.value;
+        if(value == "" || value == null){
+            element.classList.add("is-invalid");
+            element.classList.remove("is-valid");
+            invalidFeedBack(element, 1);
+            return 1;
+        }else {
+            element.classList.remove("is-invalid");
+            return 0;
+        }
+    }
+
+    function passwordCheck(element) {
+        const password = document.getElementById("password").value;
+        if(password != element.value){
+            element.classList.add("is-invalid");
+            element.classList.remove("is-valid");
+            element.nextSibling.nextSibling.innerHTML = "비밀번호가 일치하지 않습니다.";
+        }else if(element.value == "" || element.value == null){
+            element.classList.add("is-invalid");
+            element.classList.remove("is-valid");
+            element.nextSibling.nextSibling.innerHTML = "필수 정보 입니다.";
+        }else{
+            element.classList.remove("is-invalid");
+            element.classList.add("is-valid");
+        }
+    }
+
+    function invalidFeedBack(element, division) {
+        if(division == 1){
+            element.nextSibling.nextSibling.innerHTML = "필수 정보 입니다.";
+        }else if(division == 2){
+            element.nextSibling.nextSibling.innerHTML = "이미 사용중 입니다.";
+        }
+    }
+    
+    //휴대번호 유효성 체크
+    function inputCellNo(args) {	
+    	const msg = '유효하지 않는 전화번호입니다.';
+        if (/^[0-9]{3}-[0-9]{4}-[0-9]{4}$/.test(args.value)) {
+        	console.log(args.value);
+            return true;
+        }
+        // alert(msg);
+        return false;
+	}
+</script>
+</html>

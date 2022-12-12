@@ -1,0 +1,23 @@
+.none {display: none;}
+.icon{cursor: pointer; position: absolute; top: 50%; transform: translateY(-50%); right: 12%; color: #7b8a8b;}
+.profile {width: 10%; text-align: center;}
+.profile a {margin: 0;}
+.profile img {width: 24px; height: 24px;}
+
+.search {width: 70%; padding: 0 5%; position: relative;}
+.burger {width: 20%; text-align: center;}
+
+.map {width:100%; height: inherit; display: flex;}
+
+#marker_detail {position: absolute; left: 0; bottom: 0; width: 100%; background-color: #FAFAFA; }
+.detail_text {margin: 10px 20px;}
+.detail_text input {height: calc(1.3em + 0.75rem + 2px);}
+.detail_text select {height: calc(1.3em + 0.75rem + 2px);}
+.detail_text_phone {display: flex; margin-right: 20px; margin-left: 20px;}
+.detail_text_phone input {height: calc(1.3em + 0.75rem + 2px);}
+.first {flex: 1; width:30%;}
+.second {flex: 1; margin: 0px 5%; width:30%;}
+.third {flex: 1; width:30%;}
+.detail_btn {margin: 10px 20px 20px; width: 63%; display: flex;}
+.detail_btn button {margin-right: 5px;}
+.detail_btn .right {float: right;}
