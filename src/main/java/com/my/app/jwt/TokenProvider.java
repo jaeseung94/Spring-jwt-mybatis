@@ -32,12 +32,15 @@ public class TokenProvider implements InitializingBean {
 	private static final String AUTHORITIES_KEY = "auth";
 	private final String secret;
 	private final long tokenValidityInMilliseconds;
+	private final long refreshTokenValidityInSeconds;
 	private Key key;
 
 	public TokenProvider(@Value("${jwt.secret}") String secret,
-			@Value("${jwt.token-validity-in-seconds}") long tokenValidityInSeconds) {
+			@Value("${jwt.token-validity-in-seconds}") long tokenValidityInSeconds,
+			@Value("${jwt.refreshToken-validity-in-seconds}") long refreshTokenValidityInSeconds) {
 		this.secret = secret;
 		this.tokenValidityInMilliseconds = tokenValidityInSeconds * 1000;
+		this.refreshTokenValidityInSeconds = refreshTokenValidityInSeconds * 1000;
 	}
 
 	// TokenProvider 빈 생성이 되고 생성자 의존성 주입 받은 후 키값 저장
@@ -46,6 +49,7 @@ public class TokenProvider implements InitializingBean {
 		this.key = Keys.hmacShaKeyFor(secret.getBytes());
 	}
 
+	// 토큰 생성
 	public String createToken(Authentication authentication) {
 		String authorities = authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority)
 				.collect(Collectors.joining(","));
@@ -61,7 +65,7 @@ public class TokenProvider implements InitializingBean {
 				.signWith(key, SignatureAlgorithm.HS256).setExpiration(validity).compact();
 	}
 
-	// 토큰을 이용하여
+	// 토큰을 이용하여 인증 조회
 	public Authentication getAuthentication(String token) {
 		Claims claims = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
 
@@ -73,7 +77,8 @@ public class TokenProvider implements InitializingBean {
 
 		return new UsernamePasswordAuthenticationToken(principal, token, authorities);
 	}
-
+	
+	// 토큰 유효성 검사
 	public boolean validateToken(String token) {
 		try {
 			Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
@@ -88,5 +93,13 @@ public class TokenProvider implements InitializingBean {
 			logger.info("JWT 토큰이 잘못되었습니다.");
 		}
 		return false;
+	}
+	
+	// reftreshtoken 발급
+	public String createRefreshToken(Authentication authentication) {
+		long now = (new Date()).getTime();
+		Date validity = new Date(now + this.refreshTokenValidityInSeconds);
+
+		return Jwts.builder().setSubject(authentication.getName()).signWith(key, SignatureAlgorithm.HS256).setExpiration(validity).compact();
 	}
 }

@@ -39,16 +39,23 @@ jwt:
   #HS512 알고리즘을 사용할 것이기 때문에 512bit, 즉 64byte 이상의 secret key를 사용해야 한다.
   
   secret: security-jwtsecurity-jwtsecurity-jwtsecurity-jwtsecurity-jwtsecurity-jwtsecurity-jwtsecurity-jwtsecurity-jwt
-  token-validity-in-seconds: 86400
+  token-validity-in-seconds: 10 #1시간
+  refreshToken-validity-in-seconds: 86400 #24시간
 
 logging:
   level:
-    me.silvernine: DEBUG
+    my.com.app: DEBUG
     
 mybatis:   
   # 패키지 명을 생략할 수 있도록 alias 설정
   type-aliases-package: com.my.app.entity
   
+#Disabling White-label Error Page
+server:
+  error:
+    whitelabel:
+      enabled: false
+
 #server:
 #  port: 8081
 #  

@@ -61,8 +61,8 @@ public class CommonService {
                 .build();
 		
         return dto;
-    }
-    
+    }    
+      
     public int checkId(String username) {    	    	
     	return mapper.checkId(username);
     }

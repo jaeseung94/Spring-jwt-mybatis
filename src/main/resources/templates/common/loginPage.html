@@ -81,7 +81,7 @@
 		}
 
 		$.ajax({
-			url : "/comm/login",
+			url : "/comm/api/login",
 			//url : "/api/auth/login",
 			//url : "/login",
 			type : "POST",
@@ -90,25 +90,52 @@
 			data : JSON.stringify(formData),
 			//data : $("#form").serialize(),
 			success : function(data, status) {
-				if (data && data.token) {
+				if (data && data.accessToken) {
 					// 정상 처리 된 경우
-					window.location = "/comm/index";	//이전페이지로 돌아가기
-					console.log(data);
+					//console.log(data);
+					$("#invalid-message").css("display", "none");
+					sessionStorage.setItem("jwt-access-token", data.accessToken);
+					sessionStorage.setItem("jwt-refresh-token", data.refreshToken);
+					//callMyPage(data.accessToken);	//이전페이지로 돌아가기
+					location.href = "/user/myPage";
 					//alert("로그인되었습니다!");
-				} else {
+				} 
+				
+				/* else {
 					//alert(response.message);
+					$("#invalid-message").html("회원정보가 맞지 않습니다.");
 					$("#invalid-message").css("display", "");
-					$("#invalid-message").html(data.message);
 					
 					console.log(data);
-				}
+				} */
 			},
 			error : function(response) {
-				alert("관리자에게 문의 바랍니다.");
+				if(response.status == 401){
+					$("#invalid-message").html("아이디와 비밀번호를 확인해주세요.");
+					$("#invalid-message").css("display", "");
+				} else {
+					alert("관리자에게 문의 바랍니다.");					
+				}
 			}
 
 		})
 
+	}
+	
+	function callMyPage(token){
+		$.ajax({
+            type: "GET",
+            url: "/user/myPage",
+            headers: {
+                Authorization: 'Bearer ' + token
+            },
+            success: function (result, status, xhr) {
+                //ShowData(result);
+            },
+            error: function (xhr, status, error) {
+                 alert(error);
+            }
+        });
 	}
 </script>
 </html>

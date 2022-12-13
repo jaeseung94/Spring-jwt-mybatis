@@ -26,5 +26,6 @@ public class UserVO {
 	private Date regDate; // 등록일
 	private Date updateDate; // 수정일
 	private List<AuthVO> authList; // 권한 정보
+	private String refreshToken; // refreshToken
 	
 }

@@ -28,4 +28,6 @@ public class UserDto {
 	private Date regDate; // 등록일
 	private Date updateDate; // 수정일
 	private List<AuthDto> authList; // 권한 정보
+	private String accessToken;
+	private String refreshToken;
 }

@@ -64,4 +64,9 @@
 		values (seq_user_auth.nextval, #{userNo}, #{auth} )
 	</insert>
 	
+	<update id="updateRefreshToken" parameterType="HashMap">
+		update tbl_user
+		set refresh_token = #{refreshToken}
+		where id = #{id}
+	</update>
 </mapper>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html" charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <title>마이페이지</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/bootstrap.min.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/user/main.css}">
+    <script th:src="@{/js/bootstrap.min.js}"></script>
+</head>
+<body>
+<div>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <div class="profile">
+                <a class="navbar-brand" href="#"><img th:src="@{/images/iconmonstr-user-circle-thin-240.png}"></a>
+            </div>
+            <div class="search">
+                <input class="form-control mr-sm-2" type="text" id="keyword" placeholder="장소 검색">
+            </div>
+            <div class="burger">
+                <button class="navbar-toggler collapsed" type="button" data-toggle="collapse" data-target="#navbarColor02" aria-controls="navbarColor02" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+            </div>
+            <div class="navbar-collapse collapse" id="navbarColor02" style="">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/logout">로그아웃</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+    <div class="map" id="map">
+    </div>
+    <div id="marker_detail">
+<!--        <div class="title">가게이름</div>-->
+<!--        <div class="icon">-->
+<!--            <a name="tel_number"><img src="/images/main/iconmonstr-phone-1-32.png"></a>-->
+<!--            <a><img src="/images/main/iconmonstr-copy-4-32.png"></a>-->
+<!--        </div>-->
+<!--        <div class="content">-->
+<!--        <div class="div_icon"><img src="/images/main/iconmonstr-location-1-24.png"></div>-->
+<!--        <div class="div_text">-->
+<!--            <p id="road_address"></p>-->
+<!--            <p id="address"></p>-->
+<!--        </div>-->
+<!--        </div>-->
+<!--        <div class="content">-->
+<!--            <div class="div_icon"><img src="/images/main/iconmonstr-time-2-24.png"></div>-->
+<!--            <div class="div_text">-->
+<!--                <p>영업시간 <span id="state">영업중</span></p>-->
+<!--                <p id="time">월~금 10:00 ~ 19:00</p>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--        <div class="content">-->
+<!--            <div class="div_icon"><img src="/images/main/iconmonstr-user-6-24.png"></div>-->
+<!--            <div class="div_text">-->
+<!--                <p id="total_capacity">수용인원 70명</p>-->
+<!--                <p id="now_capacity">현재인원 20명</p>-->
+<!--                <p id="female">여성 10명</p>-->
+<!--                <p id="male">남성 20명</p>-->
+<!--                <p id="ratio">여성비율 20%</p>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--        <div class="content">-->
+<!--            <div class="div_icon"><img src="/images/main/iconmonstr-phone-1-24.png"></div>-->
+<!--            <div class="div_text">-->
+<!--                  <a name="tel_number"></a>-->
+<!--            </div>-->
+<!--        </div>-->
+    </div>
+</div>
+</body>
+</html>

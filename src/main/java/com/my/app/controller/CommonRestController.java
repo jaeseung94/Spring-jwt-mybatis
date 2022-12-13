@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
@@ -24,14 +25,16 @@ import com.my.app.entity.UserVO;
 import com.my.app.jwt.JwtFilter;
 import com.my.app.jwt.TokenProvider;
 import com.my.app.service.CommonService;
+import com.my.app.service.UserService;
 
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/comm")
+@RequestMapping("/comm/api")
 public class CommonRestController {
     private final CommonService commService;
+    private final UserService userService;
     private final TokenProvider tokenProvider;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     
@@ -64,36 +67,18 @@ public class CommonRestController {
 	
 	// 로그인
 	@PostMapping("/login")
-    public ResponseEntity<TokenDto> authorize(@RequestBody HashMap<String, Object> param) {
+    public ResponseEntity<TokenDto> login(@RequestBody HashMap<String, String> param) {	
     	
-    	logger.info("=================================================");
-		logger.info("AuthController 컨트롤러 authenticate");
-
-        UsernamePasswordAuthenticationToken authenticationToken =
-                new UsernamePasswordAuthenticationToken(param.get("id"), param.get("password"));
-        
-        logger.info("=================================================");
-		logger.info("AuthController 컨트롤러 UsernamePasswordAuthenticationToken 토큰");		
-		
-		// loadUserByname 실행
-        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
-        logger.info("=================================================");
-        logger.info("AuthController 컨트롤러 authentication 객체");	
-        
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        
-        logger.info("=================================================");
-        logger.info("AuthController 컨트롤러 setAuthentication() ");	
-        
-        String jwt = tokenProvider.createToken(authentication);
-        
-        logger.info("=================================================");
-		logger.info("AuthController 컨트롤러 createToken()");		
-
+		UserDto userDto = userService.login(param.get("id"), param.get("password"));
+		String accessToken = userDto.getAccessToken();
+		String refreshToken = userDto.getRefreshToken();
         HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.add(JwtFilter.AUTHORIZATION_HEADER, "Bearer " + jwt);
+        
+//        httpHeaders.add(JwtFilter.ACCESSTOKEN_HEADER, "Bearer " + accessToken);
+//        httpHeaders.add(JwtFilter.REFRESH_HEADER, "Bearer " + refreshToken);
+        httpHeaders.add(JwtFilter.AUTHORIZATION_HEADER, "Bearer " + accessToken);
 
-        return new ResponseEntity<>(new TokenDto(jwt), httpHeaders, HttpStatus.OK);
+        return new ResponseEntity<>(new TokenDto(accessToken, refreshToken), httpHeaders, HttpStatus.OK);
     }
 
     

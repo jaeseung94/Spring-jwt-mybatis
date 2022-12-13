@@ -14,7 +14,6 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.filter.CorsFilter;
 
-import com.my.app.handler.CustomAuthenticationFailureHandler;
 import com.my.app.jwt.JwtAccessDeniedHandler;
 import com.my.app.jwt.JwtAuthenticationEntryPoint;
 import com.my.app.jwt.JwtFilter;
@@ -27,24 +26,11 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
-	private final TokenProvider tokenProvider;
-	private final CorsFilter corsFilter;
-	private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+	private final  TokenProvider tokenProvider;
+	private final  CorsFilter corsFilter;
+	private final  JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 	private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
-	private final CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
 	private static final Logger logger = LoggerFactory.getLogger(SecurityConfig.class);
-
-//    public SecurityConfig(
-//            TokenProvider tokenProvider,
-//            CorsFilter corsFilter,
-//            JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint,
-//            JwtAccessDeniedHandler jwtAccessDeniedHandler
-//    ) {
-//        this.tokenProvider = tokenProvider;
-//        this.corsFilter = corsFilter;
-//        this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
-//        this.jwtAccessDeniedHandler = jwtAccessDeniedHandler;
-//    }
 
 	@Bean
 	public PasswordEncoder passwordEncoder() {
@@ -70,13 +56,7 @@ public class SecurityConfig {
                 .exceptionHandling()
                 .authenticationEntryPoint(jwtAuthenticationEntryPoint) // 인증실패
                 .accessDeniedHandler(jwtAccessDeniedHandler) // 권한실패
-
-//                // enable h2-console
-//                .and()
-//                .headers()
-//                .frameOptions()
-//                .sameOrigin()
-
+                
                 // 세션을 사용하지 않기 때문에 STATELESS로 설정
                 .and()
                 .sessionManagement()
@@ -85,6 +65,7 @@ public class SecurityConfig {
                 .and()
                 .authorizeRequests()
                 .antMatchers("/comm/**").permitAll()
+                .antMatchers("/user/**").permitAll()
 //                .antMatchers("/api/authenticate").permitAll()
 //                .antMatchers("/api/signup").permitAll()
 //                .antMatchers("/api/index").permitAll()
@@ -107,33 +88,4 @@ public class SecurityConfig {
         return httpSecurity.build();
     }
 
-//	@Bean
-//	public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
-//		logger.info("========================================================");
-//		logger.info("SecurityConfig filterChain 실행");
-//		logger.info("========================================================");
-//		httpSecurity
-//				// token을 사용하는 방식이기 때문에 csrf를 disable합니다.
-//				.csrf().disable()
-//
-//				.addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)
-//
-//				.exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint)
-//				.accessDeniedHandler(jwtAccessDeniedHandler)
-//
-//				// enable h2-console
-//				.and().headers().frameOptions().sameOrigin()
-//
-//				// 세션을 사용하지 않기 때문에 STATELESS로 설정
-//				.and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-//
-//				.and().authorizeRequests().antMatchers("/api/hello").permitAll().antMatchers("/api/authenticate")
-//				.permitAll().antMatchers("/api/signup").permitAll()
-//
-//				.anyRequest().authenticated()
-//				.and()
-//				.apply(new JwtSecurityConfig(tokenProvider));
-//
-//		return httpSecurity.build();
-//	}
 }
