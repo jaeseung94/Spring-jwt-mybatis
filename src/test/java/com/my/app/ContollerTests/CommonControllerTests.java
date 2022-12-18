@@ -1,19 +1,15 @@
 package com.my.app.ContollerTests;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.transaction.annotation.Transactional;
 
-import com.my.app.controller.CommonRestController;
+import com.my.app.controller.CommonController;
+import com.my.app.controller.UserController;
 
 import lombok.extern.log4j.Log4j2;
 
@@ -22,7 +18,8 @@ import lombok.extern.log4j.Log4j2;
 public class CommonControllerTests {
 	
 	@Autowired
-	private CommonRestController controller ;
+	private CommonController controller ;
+	private UserController userController ;
 	private MockMvc mockMvc;
 	
 	@BeforeEach
@@ -30,7 +27,7 @@ public class CommonControllerTests {
 		this.mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
 	}	
 
-	
+
 	
 //	@Test
 //	public void testModify() throws Exception {

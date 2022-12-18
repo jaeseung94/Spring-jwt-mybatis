@@ -2,6 +2,7 @@ package com.my.app.mapper;
 
 import java.util.Map;
 
+import com.my.app.dto.UserDto;
 import com.my.app.entity.AuthVO;
 import com.my.app.entity.UserVO;
 
@@ -12,5 +13,8 @@ public interface UserMapper {
 	public int insertUser(UserVO vo); // 유저 등록
 	public int insertUserAuth(AuthVO vo); // 권한 등록
 	public int updateRefreshToken(Map<String, String> map); // refreshToken 저장
+	public UserDto findUserByRefreshToken(String token);
+	public int removeRefreshToken(String token);
+	public int updateUser(UserDto userDto);
 		
 }

@@ -69,4 +69,31 @@
 		set refresh_token = #{refreshToken}
 		where id = #{id}
 	</update>
+	
+	<select id="findUserByRefreshToken" resultType="com.my.app.dto.UserDto">
+		select 
+			id,
+			email,
+			cellno,
+			name,			
+			refresh_token
+		from tbl_user
+		where refresh_token = #{token}
+	</select>
+	
+	<update id="removeRefreshToken">
+		update tbl_user
+		set refresh_token = null
+		where id = #{username}
+	</update>
+	
+	<update id="updateUser">
+		update tbl_user
+		set
+			name = #{name},
+			email = #{email},
+			cellno = #{cellno}
+		where id = #{id}
+	</update>
+	
 </mapper>

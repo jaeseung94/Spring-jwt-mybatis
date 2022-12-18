@@ -20,6 +20,6 @@ html, body {
 .signup_text_signup {margin: 40px 40px 0px; text-align: center; font-size: 11px;}
 .signup_text_signup a {text-decoration: underline;}
 .signup_text_corporation {margin: 15px 40px 0px;}
-.signup_btn {margin: 20px 40px;}
+.signup_btn {margin: 10px 40px;}
 .signup_btn button {width: 100%;}
 .signup_hr { margin: 20px 40px; background-color: #dbdbdb; height: 1px;}

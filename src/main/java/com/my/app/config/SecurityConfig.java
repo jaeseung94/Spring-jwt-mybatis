@@ -3,11 +3,15 @@ package com.my.app.config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -17,8 +21,7 @@ import org.springframework.web.filter.CorsFilter;
 import com.my.app.jwt.JwtAccessDeniedHandler;
 import com.my.app.jwt.JwtAuthenticationEntryPoint;
 import com.my.app.jwt.JwtFilter;
-//import com.my.app.jwt.JwtSecurityConfig;
-import com.my.app.jwt.TokenProvider;
+import com.my.app.service.JwtUtils;
 
 import lombok.RequiredArgsConstructor;
 
@@ -26,9 +29,10 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
-	private final  TokenProvider tokenProvider;
-	private final  CorsFilter corsFilter;
-	private final  JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+	private final JwtUtils tokenProvider;
+	private final UserDetailsService userDetailsService;
+	private final CorsFilter corsFilter;
+	private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 	private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
 	private static final Logger logger = LoggerFactory.getLogger(SecurityConfig.class);
 
@@ -39,19 +43,35 @@ public class SecurityConfig {
 
 	@Bean
 	public WebSecurityCustomizer webSecurityCustomizer() {
-		return (web) -> web.ignoring().antMatchers("/favicon.ico", "/error","/**/*.js", "/**/*.css");
+		return (web) -> web.ignoring().antMatchers("/favicon.ico", "/error", "/**/*.js", "/**/*.css");
 	}
 
-    @Bean
+	@Bean
+	public DaoAuthenticationProvider authenticationProvider() {
+		DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+
+		authProvider.setUserDetailsService(userDetailsService);
+		authProvider.setPasswordEncoder(passwordEncoder());
+
+		return authProvider;
+	}
+
+	@Bean
+	public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
+		return authConfig.getAuthenticationManager();
+	}
+
+	@Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
     	logger.info("========================================================");
     	logger.info("SecurityConfig filterChain 실행");
     	logger.info("========================================================");
         httpSecurity
                 // token을 사용하는 방식이기 때문에 csrf를 disable
-                .csrf().disable()
+        		.cors().and().csrf().disable()
+                //.csrf().disable()
                 // 교차출처리소스공유 설정
-                .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)
+               // .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)
 
                 .exceptionHandling()
                 .authenticationEntryPoint(jwtAuthenticationEntryPoint) // 인증실패
@@ -66,13 +86,16 @@ public class SecurityConfig {
                 .authorizeRequests()
                 .antMatchers("/comm/**").permitAll()
                 .antMatchers("/user/**").permitAll()
+                .antMatchers("/api/**").permitAll()
 //                .antMatchers("/api/authenticate").permitAll()
 //                .antMatchers("/api/signup").permitAll()
 //                .antMatchers("/api/index").permitAll()
 //                .antMatchers("/api/loginPage").permitAll()
-                .anyRequest().authenticated()
-                .and()
-                .formLogin()
+                .anyRequest().authenticated();
+                
+                httpSecurity.authenticationProvider(authenticationProvider());
+                
+                httpSecurity.formLogin()
                 	.loginPage("/comm/loginPage")
 //                	.loginProcessingUrl("/api/authenticate")
 //                	.successHandler(customAuthenticationSuccessHandler)

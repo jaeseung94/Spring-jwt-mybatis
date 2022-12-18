@@ -35,7 +35,7 @@ public class CommonService {
         }
         
         AuthVO authVo = new AuthVO();
-		authVo.setAuth("member");        
+		authVo.setAuth("ROLE_USER");        
 
         logger.info("========================================");
 		logger.info("CommonService signUp");

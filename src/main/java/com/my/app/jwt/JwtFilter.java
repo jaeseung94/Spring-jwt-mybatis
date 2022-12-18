@@ -14,63 +14,53 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.my.app.service.JwtUtils;
+
 import lombok.RequiredArgsConstructor;
 
-//public class JwtFilter extends GenericFilterBean {
 @RequiredArgsConstructor
-public class JwtFilter extends OncePerRequestFilter  {
+public class JwtFilter extends OncePerRequestFilter {
 
-   private static final Logger logger = LoggerFactory.getLogger(JwtFilter.class);
-//   public static final String ACCESSTOKEN_HEADER = "jwt-access-token";
-//   public static final String REFRESH_HEADER = "jwt-refresh-token";
-   public static final String AUTHORIZATION_HEADER = "Authorization";
-   private final TokenProvider tokenProvider;
-//   public JwtFilter(TokenProvider tokenProvider) {
-//      this.tokenProvider = tokenProvider;
-//   }
+	private static final Logger logger = LoggerFactory.getLogger(JwtFilter.class);
+	private final JwtUtils jwtUtils;
+	//private final UserDetailsService userDetailsService;
 
-   @Override
-//   public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
-   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) 
-		   throws IOException, ServletException {
-      //HttpServletRequest httpServletRequest = (HttpServletRequest) servletRequest;
-      //String jwt = resolveToken(httpServletRequest);
-      String jwt = resolveToken(request);
-      //String requestURI = httpServletRequest.getRequestURI();
-      String requestURI = request.getRequestURI();
-      
-      logger.info("===============================================");
-      logger.info("JwtFilter 실행 ");
-      logger.info("tokenProvider :  " + tokenProvider);
-      logger.info("===============================================");
-      
-      try {
-    	  if (StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt)) {
-    		  Authentication authentication = tokenProvider.getAuthentication(jwt);
-    		  SecurityContextHolder.getContext().setAuthentication(authentication);
-    		  logger.info("Security Context에 '{}' 인증 정보를 저장했습니다, uri: {}", authentication.getName(), requestURI);
-    	  } else {
-    		  logger.info("유효한 JWT 토큰이 없습니다, uri: {}", requestURI);
-    	  }
-    	  
-      } catch(Exception e) {
-    	  logger.info("===============================================");
-    	  logger.info("토큰 에러 발생");
-    	  logger.info(e.getMessage());
-    	  logger.info("===============================================");
-      }
+	@Override
+	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+			throws IOException, ServletException {
 
-//      filterChain.doFilter(servletRequest, servletResponse);
-      filterChain.doFilter(request, response);
-   }
+		logger.info("===============================================");
+		logger.info("JwtFilter 실행 ");
+		logger.info("===============================================");
 
-   private String resolveToken(HttpServletRequest request) {
-      String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
+		try {
+			String accessToken = jwtUtils.resolveToken(request);
+			String requestURI = request.getRequestURI();
+			
+			if (StringUtils.hasText(accessToken) && jwtUtils.validateToken(accessToken)) {
+//				String username = jwtUtils.getUserNameFromJwtToken(accessToken);
+//
+//				UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+//				UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+//						userDetails, null, userDetails.getAuthorities());
+//				authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+//				SecurityContextHolder.getContext().setAuthentication(authentication);
+				 Authentication authentication = jwtUtils.getAuthentication(accessToken);
+		         SecurityContextHolder.getContext().setAuthentication(authentication);
+				
+				logger.info("Security Context에 '{}' 인증 정보를 저장했습니다, uri: {}", authentication.getName(), requestURI);
+			} else {	
+				logger.info("유효한 JWT 토큰이 없습니다, uri: {}", requestURI);
+			}
 
-      if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
-         return bearerToken.substring(7);
-      }
+		} catch (Exception e) {
+			logger.info("===============================================");
+			logger.info("토큰 에러 발생");
+			logger.info(e.getMessage());
+			logger.info("===============================================");
+		}
 
-      return null;
-   }
+		filterChain.doFilter(request, response);
+	}
+
 }

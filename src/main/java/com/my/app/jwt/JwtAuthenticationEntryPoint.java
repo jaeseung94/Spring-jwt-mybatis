@@ -22,7 +22,10 @@ import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import lombok.RequiredArgsConstructor;
+
 @Component
+@RequiredArgsConstructor
 public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
 	private static final Logger logger = LoggerFactory.getLogger(JwtAuthenticationEntryPoint.class);
 
@@ -34,12 +37,14 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
 		logger.info("유효한 자격증명을 제공하지 않고 접근하려 할때 401 ");
 		logger.info("=================================================");
 		
+		//if(request.getHeader(JwtFilter.AUTHORIZATION_HEADER) )
+		
 		response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 	    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 
 	    final Map<String, Object> body = new HashMap<>();
 	    body.put("status", HttpServletResponse.SC_UNAUTHORIZED);
-	    body.put("error", "Unauthorized");
+	    body.put("error", "unauthenticated");
 	    body.put("message", authException.getMessage());
 	    body.put("path", request.getServletPath());
 

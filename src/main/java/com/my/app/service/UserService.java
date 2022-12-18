@@ -10,31 +10,23 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import com.my.app.controller.CommonRestController;
 import com.my.app.dto.AuthDto;
 import com.my.app.dto.UserDto;
 import com.my.app.entity.UserVO;
-import com.my.app.exception.DuplicateMemberException;
-import com.my.app.jwt.TokenProvider;
 import com.my.app.mapper.UserMapper;
+import com.my.app.util.SecurityUtil;
 
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
-    private final UserMapper mapper;
-    private final TokenProvider tokenProvider;
+    private final UserMapper userMapper;
+    private final JwtUtils jwtUtils;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
-    private static final Logger logger = LoggerFactory.getLogger(UserService.class);   
-
-    public void updateRefreshToken(Map<String, String> map) {
-    	mapper.updateRefreshToken(map);    	
-    }
+    private static final Logger logger = LoggerFactory.getLogger(UserService.class);     
     
     public UserDto login(String id, String password) {
     	logger.info("=================================================");
@@ -56,8 +48,8 @@ public class UserService {
         logger.info("=================================================");
         logger.info("UserService 서비스 setAuthentication() ");	
         
-        String accessToken = tokenProvider.createToken(authentication);
-        String refreshToken = tokenProvider.createRefreshToken(authentication);
+        String accessToken = jwtUtils.createAccessToken(id);
+        String refreshToken = jwtUtils.createRefreshToken(id);
         
         logger.info("=================================================");
         logger.info("accessToken :  " + accessToken);
@@ -71,8 +63,8 @@ public class UserService {
         map.put("id", id);
         map.put("refreshToken", refreshToken);
         
-        this.updateRefreshToken(map);        
-        UserVO user = mapper.getUser(id);
+        userMapper.updateRefreshToken(map);        
+        UserVO user = userMapper.getUser(id);
         
         return UserDto.builder()
                 .id(user.getId())
@@ -85,6 +77,40 @@ public class UserService {
         		.refreshToken(refreshToken)
                 .build();       
         
+    }
+    
+    public UserDto getMyUserInfo() {
+    	String username = SecurityUtil.getCurrentUsername();
+    	if(username == null) {
+    		new RuntimeException("로그인 유저 정보가 없습니다.");    		
+    	} 
+    	
+    	UserVO user = userMapper.getUser(username);
+    	return UserDto.builder()
+    			.id(user.getId())
+    			.email(user.getEmail())
+    			.cellno(user.getCellno())
+    			.name(user.getName())
+    			.regDate(user.getRegDate())
+    			.authList(user.getAuthList().stream().map(authority -> AuthDto.builder().auth(authority.getAuth()).build()).collect(Collectors.toList()))    
+    			.build();      
+    	
+    }
+    
+    public int updateUserInfo(UserDto userDto) {
+    	return userMapper.updateUser(userDto);
+    }
+    
+    public UserDto findUserByRefreshToken(String token) {
+    	return userMapper.findUserByRefreshToken(token);    	
+    }
+    
+    public int removeRefreshToken(String username) {
+    	return userMapper.removeRefreshToken(username);
+    }
+    
+    public int updateRefreshToken(Map<String, String> map) {
+    	return userMapper.updateRefreshToken(map);       	
     }
     
 }

@@ -14,12 +14,12 @@ public class SecurityUtil {
 
    private SecurityUtil() {}
 
-   public static Optional<String> getCurrentUsername() {
+   public static String getCurrentUsername() {
       final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
       if (authentication == null) {
          logger.debug("Security Context에 인증 정보가 없습니다.");
-         return Optional.empty();
+         return null;
       }
 
       String username = null;
@@ -30,6 +30,6 @@ public class SecurityUtil {
          username = (String) authentication.getPrincipal();
       }
 
-      return Optional.ofNullable(username);
+      return username;
    }
 }
