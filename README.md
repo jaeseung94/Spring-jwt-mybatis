@@ -1,12 +1,5 @@
 # SpringBoot + Security + JWT + mybatis
 
-## Author
-jaeseung94
-
-**SpringBoot + Security + JWT + mybatis**
+**SpringBoot + Security + JWT + mybatis + oracle **
 
 
-
-## Copyright and license
-
-The code is released under the [MIT license](LICENSE?raw=true).
