@@ -128,7 +128,7 @@
 	
     // 포커스 아웃시
     function focusOut(element) {
-        const id = element.id;
+    	var id = element.id;
         validationCheck(element);
         /* if(validationCheck(element)){	       
         	if(id == "email" || id == "id"){
@@ -139,9 +139,9 @@
 	
     // 등록된 정보인지 확인
     function ajaxCheck(element) {
-        const value = element.value;
-        const url = "/api/comm/check"+element.id.replace(/^[a-z]/, char => char.toUpperCase());
-        const submit_data = element.id +"="+value;
+    	var value = element.value;
+        var url = "/api/comm/check"+element.id.replace(/^[a-z]/, char => char.toUpperCase());
+        var submit_data = element.id +"="+value;
         var result = false;
          $.ajax({
              url: url,
@@ -173,19 +173,20 @@
 
     // 입력값 유효성 검사
     function validationCheck(element) {
-        const value = element.value;
+    	var value = element.value;
+    	var result = true;
         if(value == "" || value == null){
             element.classList.add("is-invalid");
             element.classList.remove("is-valid");
             element.nextSibling.nextSibling.innerHTML = "필수 정보입니다";
-            return false;
+            result = false;
         }else {
         	if(element.id == "cellno"){
 	        	if(!checkCellnoFormat(value)){
 	        		element.classList.add("is-invalid");
 	                element.classList.remove("is-valid");
 	        		element.nextSibling.nextSibling.innerHTML = "유효하지 않는 전화번호입니다.";
-	        		return false;
+	        		result = false;
 	        	} else {
 	       			element.classList.remove("is-invalid");
 	                element.classList.add("is-valid");
@@ -195,7 +196,7 @@
 	        		element.classList.add("is-invalid");
 	                element.classList.remove("is-valid");
 	        		element.nextSibling.nextSibling.innerHTML = "유효하지 않는 이메일입니다.";
-	        		return false;
+	        		result = false;
 	        	} else {
 	       			/* element.classList.remove("is-invalid");
 	                element.classList.add("is-valid"); */
@@ -206,15 +207,17 @@
         	} else {
 	        	element.classList.remove("is-invalid");
 	            element.classList.add("is-valid");
-	            return true;
+	          
         		
         	}
         }
+        
+        return result;
     }
 
     // 비밀번호 체크
     function passwordCheck(element) {
-        const password = document.getElementById("password").value;
+        var password = document.getElementById("password").value;
         if(password != element.value){
             element.classList.add("is-invalid");
             element.classList.remove("is-valid");
