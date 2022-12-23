@@ -30,4 +30,5 @@ public class UserDto {
 	private List<AuthDto> authList; // 권한 정보
 	private String accessToken;
 	private String refreshToken;
+	private String authProvider;
 }

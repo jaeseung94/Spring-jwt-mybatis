@@ -10,12 +10,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-//@Getter
-//@Setter
-//@NoArgsConstructor
-//@AllArgsConstructor
-//@Builder
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+//@Data
 public class UserVO {	
 	private int tno; // 테이블번호
 	private String id; // 아이디
@@ -27,5 +27,6 @@ public class UserVO {
 	private Date updateDate; // 수정일
 	private List<AuthVO> authList; // 권한 정보
 	private String refreshToken; // refreshToken
+	private String authProvider; // oAuth2 플랫폼명
 	
 }

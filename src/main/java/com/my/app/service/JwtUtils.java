@@ -15,14 +15,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -53,17 +51,7 @@ public class JwtUtils implements InitializingBean {
 	private long refreshTokenValidityInseconds;
 	private final UserMapper userMapper;
 	private final UserDetailsService userDetailsService;
-	private final AuthenticationManagerBuilder authenticationManagerBuilder;
 	private Key key;
-
-//	public JwtUtils(@Value("${jwt.secret}") String secret,
-//			@Value("${jwt.accessToken-validity-in-seconds}") long tokenValidityInSeconds,
-//			@Value("${jwt.refreshToken-validity-in-seconds}") long refreshTokenValidityInSeconds
-//			) {
-//		this.secret = secret;
-//		this.accessTokenValidityInMilliseconds = tokenValidityInSeconds * 1000;
-//		this.refreshTokenValidityInMilliseconds = refreshTokenValidityInSeconds * 1000;
-//	}
 
 	// TokenProvider 빈 생성이 되고 생성자 의존성 주입 받은 후 키값 저장
 	@Override
@@ -83,10 +71,6 @@ public class JwtUtils implements InitializingBean {
 		return Jwts.builder().setSubject(authentication.getName()).claim(AUTHORITIES_KEY, authorities)
 				.signWith(key, SignatureAlgorithm.HS512)
 				.setExpiration(new Date((new Date()).getTime() + refreshTokenValidityInseconds * 1000)).compact();
-
-//		return Jwts.builder().setSubject(username).setIssuedAt(new Date())
-//				.setExpiration(new Date((new Date()).getTime() + refreshTokenValidityInseconds * 1000))
-//				.signWith(key, SignatureAlgorithm.HS256).compact();
 	}
 	
 	// access토큰 생성
@@ -124,7 +108,7 @@ public class JwtUtils implements InitializingBean {
 	public String verifyRefreshExpiration(String token) {
 		
 		try {
-			Date expireDate = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody()
+			Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody()
 					.getExpiration();			
 
 		} catch (Exception e) {
@@ -186,13 +170,6 @@ public class JwtUtils implements InitializingBean {
 		}
 		
 		return null;
-//		String token = null;
-//		
-//		Cookie cookie = WebUtils.getCookie(request, tokenType);
-//		if (cookie != null) {
-//			token = cookie.getValue();
-//		}
-//		return token;
 	}
 	
 	// 토큰을 이용하여 인증 조회
@@ -209,21 +186,5 @@ public class JwtUtils implements InitializingBean {
 	}
 
 
-	
-//	// 토큰 생성
-//	public String createToken(Authentication authentication) {
-//		String authorities = authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority)
-//				.collect(Collectors.joining(","));
-//		
-//		logger.info("===============================================");
-//		logger.info("authorities : " + authorities);
-//		logger.info("===============================================");
-//
-//		long now = (new Date()).getTime();
-//		Date validity = new Date(now + this.tokenValidityInMilliseconds);
-//
-//		return Jwts.builder().setSubject(authentication.getName()).claim(AUTHORITIES_KEY, authorities)
-//				.signWith(key, SignatureAlgorithm.HS256).setExpiration(validity).compact();
-//	}
 }
 

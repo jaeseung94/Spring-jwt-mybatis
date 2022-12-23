@@ -1,5 +1,18 @@
 spring:
-
+  profiles:
+    include: oAuth2
+    
+#  security:
+#    oauth2:
+#      client:
+#        registration:
+#          google:
+#            client-id: 612501235071-6s7jb9tk9e66afinm4h2taa7m352cdve.apps.googleusercontent.com
+#            client-secret: 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
+#            scope: 
+#                - email
+#                - profile
+#    
   datasource:
     url: jdbc:oracle:thin:@localhost:1521/xe
     driver-class-name: oracle.jdbc.driver.OracleDriver
@@ -34,6 +47,8 @@ server:
   error:
     whitelabel:
       enabled: false
+      
+      
 
 #server:
 #  port: 8081

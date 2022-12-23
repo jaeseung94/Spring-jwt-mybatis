@@ -4,6 +4,7 @@ import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,7 +21,6 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class CommonService {
-    private final PasswordEncoder passwordEncoder;
     private final UserMapper mapper;
     private static final Logger logger = LoggerFactory.getLogger(CommonService.class);   
 
@@ -43,7 +43,7 @@ public class CommonService {
 		logger.info("========================================");
 		
 		// 회원 등록
-		vo.setPassword(passwordEncoder.encode(vo.getPassword()));
+		vo.setPassword(new BCryptPasswordEncoder().encode(vo.getPassword()));
 		//vo.setCellno(vo.getCellno().replaceAll("-", ""));
 		mapper.insertUser(vo);
 		authVo.setUserNo(vo.getTno());

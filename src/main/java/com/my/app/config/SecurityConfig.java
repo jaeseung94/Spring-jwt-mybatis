@@ -15,12 +15,14 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.filter.CorsFilter;
 
 import com.my.app.jwt.JwtAccessDeniedHandler;
 import com.my.app.jwt.JwtAuthenticationEntryPoint;
 import com.my.app.jwt.JwtFilter;
+import com.my.app.service.CustomOAuth2UserService;
 import com.my.app.service.JwtUtils;
 
 import lombok.RequiredArgsConstructor;
@@ -29,37 +31,40 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
-	private final JwtUtils tokenProvider;
-	private final UserDetailsService userDetailsService;
+	private final JwtUtils jwtUtils;
+	//private final UserDetailsService userDetailsService;
+	//private final PasswordEncoder passwordEncoder;
+	private final CustomOAuth2UserService customOAuth2UserService;
 	private final CorsFilter corsFilter;
 	private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+	private final AuthenticationSuccessHandler authenticationSuccessHandler;
 	private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
 	private static final Logger logger = LoggerFactory.getLogger(SecurityConfig.class);
 
-	@Bean
-	public PasswordEncoder passwordEncoder() {
-		return new BCryptPasswordEncoder();
-	}
+//	@Bean
+//	public PasswordEncoder passwordEncoder() {
+//		return new BCryptPasswordEncoder();
+//	}
 
 	@Bean
 	public WebSecurityCustomizer webSecurityCustomizer() {
 		return (web) -> web.ignoring().antMatchers("/favicon.ico", "/error", "/**/*.js", "/**/*.css");
 	}
 
-	@Bean
-	public DaoAuthenticationProvider authenticationProvider() {
-		DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+//	@Bean
+//	public DaoAuthenticationProvider authenticationProvider() {
+//		DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+//
+//		authProvider.setUserDetailsService(userDetailsService);
+//		authProvider.setPasswordEncoder(passwordEncoder());
+//
+//		return authProvider;
+//	}
 
-		authProvider.setUserDetailsService(userDetailsService);
-		authProvider.setPasswordEncoder(passwordEncoder());
-
-		return authProvider;
-	}
-
-	@Bean
-	public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
-		return authConfig.getAuthenticationManager();
-	}
+//	@Bean
+//	public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
+//		return authConfig.getAuthenticationManager();
+//	}
 
 	@Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
@@ -69,44 +74,48 @@ public class SecurityConfig {
         httpSecurity
                 // token을 사용하는 방식이기 때문에 csrf를 disable
         		.cors().and().csrf().disable()
-                //.csrf().disable()
                 // 교차출처리소스공유 설정
                // .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)
+        		.authorizeRequests()
+        		.antMatchers("/comm/**").permitAll()
+        		.antMatchers("/user/**").permitAll()
+        		.antMatchers("/api/**").permitAll()
+        		.antMatchers("/login/**").permitAll()
+        		.antMatchers("/oauth2/**").permitAll()
+        		.anyRequest().authenticated();        
 
+        httpSecurity
                 .exceptionHandling()
                 .authenticationEntryPoint(jwtAuthenticationEntryPoint) // 인증실패
-                .accessDeniedHandler(jwtAccessDeniedHandler) // 권한실패
-                
-                // 세션을 사용하지 않기 때문에 STATELESS로 설정
-                .and()
+                .accessDeniedHandler(jwtAccessDeniedHandler); // 권한실패   
+		                
+        // 세션을 사용하지 않기 때문에 STATELESS로 설정
+      	httpSecurity
                 .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
-                .and()
-                .authorizeRequests()
-                .antMatchers("/comm/**").permitAll()
-                .antMatchers("/user/**").permitAll()
-                .antMatchers("/api/**").permitAll()
-//                .antMatchers("/api/authenticate").permitAll()
-//                .antMatchers("/api/signup").permitAll()
-//                .antMatchers("/api/index").permitAll()
-//                .antMatchers("/api/loginPage").permitAll()
-                .anyRequest().authenticated();
+//                httpSecurity.authenticationProvider(authenticationProvider());
                 
-                httpSecurity.authenticationProvider(authenticationProvider());
-                
-                httpSecurity.formLogin()
-                	.loginPage("/comm/loginPage")
-//                	.loginProcessingUrl("/api/authenticate")
-//                	.successHandler(customAuthenticationSuccessHandler)
-//                	.failureHandler(customAuthenticationFailureHandler)
-                	.usernameParameter("id")	//스프링 시큐리티에서는 username을 기본 아이디 매핑 값으로 사용하는데 이거 쓰면 변경
-    				.passwordParameter("password")	//이건 password를 변경
-                	.permitAll()
-                .and()
-                // JwtAuthenticationFilter를 UsernamePasswordAuthenticationFilter 전에 넣는다
-                .addFilterBefore(new JwtFilter(tokenProvider),
-                        UsernamePasswordAuthenticationFilter.class);
+        httpSecurity
+        	.formLogin()
+        	.loginPage("/comm/loginPage")
+        	.usernameParameter("id")	//스프링 시큐리티에서는 username을 기본 아이디 매핑 값으로 사용하는데 이거 쓰면 변경
+			.passwordParameter("password")	//이건 password를 변경
+        	.permitAll();
+        
+        httpSecurity
+        	.oauth2Login()
+        	.defaultSuccessUrl("/user/myPage")	
+        	.userInfoEndpoint()			// 로그인 성공 후 사용자정보를 가져온다
+            .userService(customOAuth2UserService)	//사용자정보를 처리할 때 사용한다	       
+	        .and()
+	        .successHandler(authenticationSuccessHandler);
+	        //.failureHandler(authenticationFailureHandler);
+	            
+        httpSecurity
+            // JwtAuthenticationFilter를 UsernamePasswordAuthenticationFilter 전에 넣는다
+            .addFilterBefore(new JwtFilter(jwtUtils),
+                    UsernamePasswordAuthenticationFilter.class);
 
         return httpSecurity.build();
     }

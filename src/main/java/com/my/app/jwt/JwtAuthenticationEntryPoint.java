@@ -36,9 +36,7 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
 		logger.info("=================================================");
 		logger.info("유효한 자격증명을 제공하지 않고 접근하려 할때 401 ");
 		logger.info("=================================================");
-		
-		//if(request.getHeader(JwtFilter.AUTHORIZATION_HEADER) )
-		
+				
 		response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 	    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 

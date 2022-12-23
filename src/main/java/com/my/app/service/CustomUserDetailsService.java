@@ -35,6 +35,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 			logger.info("사용자를 찾을 수 없습니다. ");
 			throw new UsernameNotFoundException(username + " -> 사용자를 찾을 수 없습니다.");
 		}
+		//return new PrincipalDetails(vo);
 		
 		return new CustomUser(vo);
 		

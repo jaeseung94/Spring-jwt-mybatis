@@ -10,6 +10,7 @@
 		<result property="cellno" column="cellno"/>
 		<result property="password" column="password"/>
 		<result property="name" column="name"/>
+		<result property="authProvider" column="authProvider"/>
 		<result property="regDate" column="regDate"/>
 		<result property="updateDate" column="updateDate"/>		
 		<collection property="authList" resultMap="authMap"></collection>
@@ -26,6 +27,13 @@
 		from tbl_user a
 		left join tbl_user_auth b on b.user_no = a.tno
 		where a.id = #{userid} 
+	</select>
+	
+	<select id="findUserByEmail" resultMap="userMap">
+		select a.*, b.auth 
+		from tbl_user a
+		left join tbl_user_auth b on b.user_no = a.tno
+		where a.email = #{email} 
 	</select>
 	
 	<!-- 사용자 조회 -->
@@ -50,13 +58,17 @@
 			select seq_user.CURRVAL FROM DUAL
 		</selectKey>
 
-        <!-- begin
-            insert into tbl_user(tno, id, email, password, cellno, name)
-			values (#{tno}, #{id},  #{email}, #{password}, #{cellno}, #{name});
-			
-			insert into tbl_user_auth(tno, user_no, auth)
-			values (seq_user_auth.nextval, #{tno}, 'member' );
-        end; -->
+	</insert>
+	
+	<insert id="insertUserByOAuth2" >
+		
+		insert into tbl_user(tno, id, email, password, name, authProvider)
+		values (seq_user.nextval, #{id},  #{email}, #{password}, #{name}, #{authProvider})
+				
+		<selectKey keyProperty="tno" resultType="int" order="AFTER" >
+			select seq_user.CURRVAL FROM DUAL
+		</selectKey>
+
 	</insert>
 	
 	<insert id="insertUserAuth">

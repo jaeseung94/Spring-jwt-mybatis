@@ -1,7 +1,5 @@
 package com.my.app.controller;
 
-import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.http.Cookie;
@@ -10,7 +8,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,7 +20,6 @@ import org.springframework.web.util.WebUtils;
 
 import com.my.app.dto.TokenDto;
 import com.my.app.dto.UserDto;
-import com.my.app.entity.UserVO;
 import com.my.app.exception.TokenRefreshException;
 import com.my.app.service.JwtUtils;
 import com.my.app.service.UserService;
@@ -35,10 +31,7 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api/user")
 public class UserRestController {
     private final UserService userService;
-    private final JwtUtils tokenProvider;
     private final JwtUtils jwtUtils;
-    //private final AuthenticationManagerBuilder authenticationManagerBuilder;
-    
     private static final Logger logger = LoggerFactory.getLogger(UserRestController.class);
 
     @GetMapping("/hello")
@@ -53,7 +46,7 @@ public class UserRestController {
     
 	// 로그인
 	@PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody Map<String, String> param, HttpServletRequest request, HttpServletResponse response) {	
+    public ResponseEntity<?> login(@RequestBody Map<String, String> param, HttpServletResponse response) {	
     	
 		UserDto userDto = userService.login(param.get("id"), param.get("password"));
 		String accessToken = userDto.getAccessToken();
@@ -153,19 +146,6 @@ public class UserRestController {
     	}
     	return "로그아웃처리";
     }
-
-//  
-    
-//    @PostMapping("/refreshToken")
-//    public ResponseEntity<Map<String, String>> refreshToken(@RequestBody UserVO user){
-//    	
-//    	Map<String, String> map = new HashMap<String, String>();
-//    	if(tokenProvider.validateToken(user.getRefreshToken())) {
-//    		//map.put(key, value)
-//    	}
-//    	
-//    	return new ResponseEntity<Map<String,String>>(map, HttpStatus.ACCEPTED);
-//    }
     
     @GetMapping("/{username}")
     @PreAuthorize("hasAnyRole('ADMIN')")
